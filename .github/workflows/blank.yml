@@ -1,42 +1,40 @@
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          docker pull k8s.gcr.io/build-image/kube-cross:v1.23.0-go1.17.5-bullseye.0
-          docker tag k8s.gcr.io/build-image/kube-cross:v1.23.0-go1.17.5-bullseye.0 crpi-d7vdgkzyxvl4k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
-      
-      - name: Log in to Alibaba Cloud Docker Registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          username: ${{ secrets.ALIYUN_USERNAME }}
-          password: ${{ secrets.ALIYUN_PASSWORD }}
-          registry: crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com
-      
-      # Runs a set of commands using the runners shell
-      - name: Push to Alibaba Cloud Docker Registry
-        run: |
-          docker push crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
+    - name: Setup proxy
+      env:
+        http_proxy: http://117.68.38.149:35917
+        https_proxy: http://117.68.38.149:35917
+      run: |
+        echo "http_proxy=$http_proxy" >> ~/.bashrc
+        echo "https_proxy=$https_proxy" >> ~/.bashrc
+        source ~/.bashrc
+        echo "Proxy set to $http_proxy and $https_proxy"
+
+    - name: Login to Alibaba Cloud Docker Registry
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.ALIYUN_USERNAME }}
+        password: ${{ secrets.ALIYUN_PASSWORD }}
+        registry: crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com
+
+    - name: Pull image
+      run: docker pull crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
+
+    - name: Push image
+      run: |
+        docker tag crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0 crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
+        docker push crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
