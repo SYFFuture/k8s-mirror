@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the workflow will run
@@ -10,7 +8,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -29,15 +27,16 @@ jobs:
       - name: Run a multi-line script
         run: |
           docker pull k8s.gcr.io/build-image/kube-cross:v1.23.0-go1.17.5-bullseye.0
-          docker tag k8s.gcr.io/build-image/kube-cross:v1.23.0-go1.17.5-bullseye.0 shangyff/k8s.gcr.io:kube-cross-v1.23.0-go1.17.5-bullseye.0
+          docker tag k8s.gcr.io/build-image/kube-cross:v1.23.0-go1.17.5-bullseye.0 crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
       
-      - name: Log in to Docker Hub
+      - name: Log in to Alibaba Cloud Docker Registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+          registry: crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com
       
       # Runs a set of commands using the runners shell
-      - name: Push to Docker Registry
+      - name: Push to Alibaba Cloud Docker Registry
         run: |
-          docker push shangyff/k8s.gcr.io:kube-cross-v1.23.0-go1.17.5-bullseye.0
+          docker push crpi-d7vdgkzyxv14k7rt.cn-hangzhou.personal.cr.aliyuncs.com/kube-cross1111/kube-cross1111:v1.23.0-go1.17.5-bullseye.0
